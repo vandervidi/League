@@ -24,6 +24,7 @@ private:
 public:
         game (int roundNum, Date date);
         game();
+		game(const game& g);
 
         //Getters and Setters 
         Date getDate() {

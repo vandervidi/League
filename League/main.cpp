@@ -10,11 +10,11 @@
 using namespace std;
 
 //Team members : Vidran Abdovich - 312064829, Ofir Aghai -
-//-----------------------------------------------//
+//----------------------------------------------//
 //The methods 'sort' - sorts lexicoraphically	//
 //a vector of strings using quick sort algorithm//
 //and then prints the vector as an output.		//
-//----------------------------------------------	//
+//----------------------------------------------//
 void sort(vector<string> v){
 	int sz = v.size();
 	for (int i = 0; i < sz; i++){
@@ -31,8 +31,74 @@ void sort(vector<string> v){
 		cout<<i+1<<". "<<v[i]<<endl;
 	}
 }
+//-----------------------------------------------//
+// This method converts a string containing a	 //
+// a month name in its shorter version, into an  //
+// integer type .e.g OCT -> 10					 //
+//-----------------------------------------------//
+int monthToInt(string month)
+{
+	std::transform(month.begin(), month.end(), month.begin(), ::tolower);
 
+	if (month.compare("jan")==0) {return 1;}
+	else if (month.compare("feb")==0) {return 2;}
+	else if (month.compare("mar")==0) {return 3;}
+	else if (month.compare("apr")==0) {return 4;}
+	else if (month.compare("may")==0) {return 5;}
+	else if (month.compare("june")==0) {return 6;}
+	else if (month.compare("july")==0) {return 7;}
+	else if (month.compare("aug")==0) {return 8;}
+	else if (month.compare("sep")==0) {return 9;}
+	else if (month.compare("oct")==0) {return 10;}
+	else if (month.compare("nov")==0) {return 11;}
+	else if (month.compare("dec")==0) {return 12;}
+	else return -1;
+}
 
+//----------------------------------------------//
+//This methods 'splitStr' recives a string type	//
+//and returns a vector of strings where each	//
+//index stores a word from the sentence that is //
+//splitted.										//
+//----------------------------------------------//
+vector<string> splitStr(string str){
+	string buf;				
+	stringstream ss(str);	
+	vector<string> tokens;	// Create vector to hold our words
+
+	while (ss >> buf){
+		if (!buf.empty())	
+		tokens.push_back(buf);
+	}
+	return tokens;
+}
+
+//-----------------------------------------------//
+//The methods 'sort' - sorts lexicoraphically	//
+//a vector of strings using quick sort algorithm//
+//and then prints the vector as an output to	//
+// file.										//
+//----------------------------------------------	//
+void sortToFile(vector<string> v,string outputFileName){
+	ofstream fileWriter;
+	fileWriter.open(outputFileName, ios_base::app);
+	int sz = v.size();
+	for (int i = 0; i < sz; i++){
+		for (int j = i+1; j < sz; j++){
+			if (v[i].compare(v[j]) > 0){ 
+				string tmp;
+				tmp = v[i];
+				v[i] = v[j];
+				v[j] = tmp;
+			}
+		}
+	}
+	fileWriter<<"Teams"<<endl<<"-------"<<endl;
+	for (int i = 0; i < sz; i++){
+		fileWriter<<i+1<<". "<<v[i]<<endl;
+	}
+	fileWriter<<endl;
+}
 //------------------------------------------------//
 // before sending to splitStr()					  //
 // from "aab. tr, ew, .sdff" => "aab tr ew sdff"  //
@@ -54,30 +120,160 @@ string delimetersRemover(string str, string delimitersVector, char to ){
 	}
 	return str;
 }
-
-//-----------------------------------------------//
-//This methods 'splitStr' recives a string type	//
-//and returns a vector of strings where each	//
-//index stores a word from the sentence that is //
-//splitted.										//
-//----------------------------------------------	//
-vector<string> splitStr(string str){
-	string buf;				
-	stringstream ss(str);	
-	vector<string> tokens;	// Create vector to hold our words
-
-	while (ss >> buf){
-		if (!buf.empty())	
-		tokens.push_back(buf);
+//------------------------------------------------//
+//This method updates the games database. how?	  //
+//1. it save every line from Games database into a//
+//vector of strings. Then updates the desired line//
+//2. Overites the games database file			  //
+//------------------------------------------------//
+void updateGamesDatabase(int roundNumber , string day, string month, string year)
+{
+	ofstream fileWriter;
+	ifstream fileReader;
+	fileReader.open("games.db");
+	string tmp;
+	string updatedLine;
+	vector<string> lines;
+	//Save every line from games database to a vector
+	while(getline(fileReader, tmp))
+	{
+		lines.push_back(tmp);
 	}
-	return tokens;
+	fileReader.close();
+	fileWriter.open("games.db",ios::out);
+	//make the correction
+	for(int i=0; i<lines.size() ; i++)
+	{
+		updatedLine="";
+		vector<string> tempVector = splitStr(lines.at(i));
+		if (tempVector[0].compare("game")==0 && tempVector[1].compare(to_string(roundNumber))==0)
+		{
+			tempVector[2]=month;
+			tempVector[3]=day;
+			tempVector[4]=year;
+			updatedLine=tempVector[0]+" "+tempVector[1]+" "+tempVector[2]+" "+tempVector[3]+" "+tempVector[4];
+			lines[i]=updatedLine;
+		}
+	}
+
+	//overwrite the games database file
+	for(int i=0; i < lines.size(); i++)
+	{
+		fileWriter<<lines[i]<<endl;
+	}
 }
 
+
+//------------------------------------------------//
+//Thie method corrects a wrong date in a league	  //
+//game.											  //
+//------------------------------------------------//
+void correctGameDate(string str, vector<team>* teams){
+	//Remove all kind of special signs from the date.
+	str= delimetersRemover(str, ",.\0", ' ' );
+	vector<string> tokenizedString = splitStr(str);
+	int gameNum=stoi(tokenizedString[2]);
+	int day = stoi(tokenizedString[4]);
+	int month = monthToInt(tokenizedString[3]);
+	int year = stoi(tokenizedString[5]);
+	Date newDate(day,month,year);
+
+	//iterate league teams and update the date of every game that matches
+	//the given game number.
+	for (int i=0; i< teams->size() ; i++)
+	{
+		for(int j=0 ; j<teams->at(i).getGames()->size(); j++)
+		{
+			if(teams->at(i).getGames()->at(j)->getRoundNum()==gameNum)
+			{
+				teams->at(i).getGames()->at(j)->setDate(newDate);
+			}
+		}
+
+	}
+
+	//now update the date in games.db file
+	updateGamesDatabase(gameNum , tokenizedString[4],tokenizedString[3],tokenizedString[5]);
+}
+
+//------------------------------------------------//
+//Thie method returns the database name from the  //
+//command line arguments if is set				  //
+//------------------------------------------------//
+string analyzeDbFromArgv(int argc, char** argv)
+{
+	vector<string> argvVector;
+	//push every argument into a vector of strings
+	for (int i=0; i<argc; i++){
+	string argvString(argv[i]);
+	argvVector.push_back(argvString);
+	}
+
+	//db analyze
+	for (int i=0; i<argvVector.size(); i++)
+	{
+
+		if (argvVector[i]=="-db")
+			return argvVector[i+1];
+	}
+return "database";
+
+}
+
+//------------------------------------------------//
+//Thie method returns the output file name from   //
+//the command line arguments if is set			  //
+//------------------------------------------------//
+string analyzeInputFromArgv(int argc, char** argv)
+{
+	vector<string> argvVector;
+	//push every argument into a vector of strings
+	for (int i=0; i<argc; i++){
+	string argvString(argv[i]);
+	argvVector.push_back(argvString);
+	}
+
+	//input file analyze
+	for (int i=0; i<argvVector.size(); i++)
+	{
+
+		if (argvVector[i]=="-i")
+			return argvVector[i+1];
+	}
+return "@";
+
+}
+
+//------------------------------------------------//
+//Thie method returns the input file name from    //
+//the command line arguments if is set			  //
+//------------------------------------------------//
+string analyzeOutputFromArgv(int argc, char** argv)
+{
+	vector<string> argvVector;
+	//push every argument into a vector of strings
+	for (int i=0; i<argc; i++){
+	string argvString(argv[i]);
+	argvVector.push_back(argvString);
+	}
+
+	//input file analyze
+	for (int i=0; i<argvVector.size(); i++)
+	{
+
+		if (argvVector[i]=="-o")
+			return argvVector[i+1];
+	}
+return "@";
+
+}
+
+
 //-----------------------------------------------//
-//This methods 'chck_input' recieces users input//
-//and directs it to the correct case in the		//
-//Switch/Case menu.								//
-//----------------------------------------------	//
+//This methods 'check_input' recieces users input//
+//and directs it to the correct case in the	     //
+//Switch/Case menu.								 //
+//---------------------------------------------- //
 int check_input(string str)
 {
 	// check empty string
@@ -109,6 +305,15 @@ int check_input(string str)
 	else if (tokenized[0]== "game" && tokenized.size()>=5){		//size of words
 		return 11;
 	}
+	//In terminal - 
+	else if (tokenized[0]== "correction" && tokenized[1]== "game"){
+		return 12;
+	}
+
+	//In terminal - 
+	else if (tokenized[0]== "correction" && tokenized[1].compare("game")!=0){
+		return 13;
+	}
 	// //In terminal - 'exit'
 	else if(tokenized[0]=="exit"){
 		return 777;
@@ -135,8 +340,9 @@ void addTeam() {
 
 	outputToTeamsDb.close();
 }
-
-//A method that writes a string to games.db file//
+//-----------------------------------------------//
+//A method that writes a string to games.db file //
+//-----------------------------------------------//
 void writeToGamesDB(string str)
 {
 	ofstream of;
@@ -145,32 +351,12 @@ void writeToGamesDB(string str)
 	of.close();
 }
 
-// This method converts a string containing a	//
-// a month name in its shorter version, into an //
-// integer type .e.g OCT -> 10					//
-int monthToInt(string month)
-{
-	std::transform(month.begin(), month.end(), month.begin(), ::tolower);
-
-	if (month.compare("jan")==0) {return 1;}
-	else if (month.compare("feb")==0) {return 2;}
-	else if (month.compare("mar")==0) {return 3;}
-	else if (month.compare("apr")==0) {return 4;}
-	else if (month.compare("may")==0) {return 5;}
-	else if (month.compare("june")==0) {return 6;}
-	else if (month.compare("july")==0) {return 7;}
-	else if (month.compare("aug")==0) {return 8;}
-	else if (month.compare("sep")==0) {return 9;}
-	else if (month.compare("oct")==0) {return 10;}
-	else if (month.compare("nov")==0) {return 11;}
-	else if (month.compare("dec")==0) {return 12;}
-	else return -1;
-}
-
+//-----------------------------------------------//
 //This method reads to teams.db file and outputs //
 //to the screen a list of all registered games	 //
+//-----------------------------------------------//
 
-void showTeams(){
+void showTeams(string outputFileName){
 	string teamName;
 	ifstream fileReader;
 	fileReader.open("teams.db");
@@ -178,8 +364,13 @@ void showTeams(){
 	while(getline(fileReader,teamName)) {
 		tmp.push_back(teamName);
 	}
-	cout<<"There are "<<tmp.size()<<" teams in this league:"<<endl;
-	sort(tmp);
+	cout<<"Teams"<<endl<<"-------"<<endl;
+	if (outputFileName.compare("@")==0)
+		sort(tmp);
+	else{
+		sort(tmp);
+		sortToFile(tmp, outputFileName);
+	}
 }
 
 void help(){
@@ -191,8 +382,10 @@ void help(){
 	}
 	fileReader.close();
 }
-
-// create from line "Game x, mon. xx, xxxx" game object
+//-----------------------------------------------//
+// create from line "Game x, mon. xx, xxxx" game //
+//object										 //
+//-----------------------------------------------//
 game saveGameDetailsTemp(vector<string> lineVector){
 	Date roundDate = Date();
 	
@@ -427,7 +620,30 @@ vector<game> readGameAtRound(string line, int typeInput, bool writeToFile, int* 
 							{
 								if (leaguePtr->getTeams()->at(i).getName().compare(newGame.getHomeGroup())==0  
 									|| leaguePtr->getTeams()->at(i).getName().compare(newGame.getAwayGroup())==0)
-									leaguePtr->getTeams()->at(i).getGames()->push_back(&newGame);
+								{
+									leaguePtr->getTeams()->at(i).getGames()->push_back(new game(newGame));
+									// if this is the home team
+									if(leaguePtr->getTeams()->at(i).getName().compare(newGame.getHomeGroup())==0)
+									{
+										//add points to "points for" and points to "points against"
+										leaguePtr->getTeams()->at(i).setPointsFor(leaguePtr->getTeams()->at(i).getPointsFor() + newGame.getHomeFinalScore());
+										leaguePtr->getTeams()->at(i).setPointsAgainst(leaguePtr->getTeams()->at(i).getPointsAgainst() + newGame.getAwayFinalScore());
+										//if home team is the winner then add 2 points to league points.
+										if(newGame.getHomeFinalScore() > newGame.getAwayFinalScore())
+											leaguePtr->getTeams()->at(i).setLeaguePoints(leaguePtr->getTeams()->at(i).getLeaguePoints() + 2);
+									}
+
+									//if this is the away team
+									if(leaguePtr->getTeams()->at(i).getName().compare(newGame.getAwayGroup())==0)
+									{
+										//add points to "points for" and points to "points against"
+										leaguePtr->getTeams()->at(i).setPointsFor(leaguePtr->getTeams()->at(i).getPointsFor() + newGame.getAwayFinalScore());
+										leaguePtr->getTeams()->at(i).setPointsAgainst(leaguePtr->getTeams()->at(i).getPointsAgainst() + newGame.getHomeFinalScore());
+										//if away team is the winner then add 2 points to league points.
+									if(newGame.getHomeFinalScore() < newGame.getAwayFinalScore())
+										leaguePtr->getTeams()->at(i).setLeaguePoints(leaguePtr->getTeams()->at(i).getLeaguePoints() + 2);
+									}
+								}
 							}
 						}
 					}
@@ -478,26 +694,45 @@ vector<game> readGameAtRound(string line, int typeInput, bool writeToFile, int* 
 	return v;
 }
 
-
-void user_menu(league* league, const int session, const vector<game>* games, int* lastRound){
-
+void user_menu(league* league, const int session, const vector<game>* games, int* lastRound, int argc, char** argv)
+{
 	string str;
 	int caseNum;
+	string dbName =	analyzeDbFromArgv(argc,argv);
+	string outputFileName =	analyzeOutputFromArgv(argc,argv);
+	string inputFileName =	analyzeInputFromArgv(argc,argv);
+	ifstream fileReader;
+	
+	fileReader.open(inputFileName);
+	if (fileReader.fail())
+	{
+		cout<<"Failed opening input file : "<<inputFileName<<endl;
+	}
 
 	do {
+	//if input file is passed as an argument thn initialize input stream
+	//and read & xecute lines from it. otherwise, get input from keyboard.
+	if (inputFileName.compare("@")!=0 && fileReader.good())
+	{
+		getline(fileReader,str);
+	}	
+	else
+	{
+		fileReader.close();  //closing stream to input file because it reached EOF
 		cout<<"type command or type 'help' for list of valid commands."<<endl;
 		getline(cin,str);
+	}
 		str = delimetersRemover(str, ",.()\0", ' ' );	//delete "."   ","   "("   ")"
 		caseNum = check_input(str);
 		if (caseNum != -1) { // vaild command
 
 			switch(caseNum) {
 			case 1: 	//SHOW TEAMS
-				showTeams();
+				showTeams(outputFileName);
 				break;
 
 			case 2: 
-				league->createLeagueTable();
+				league->createLeagueTable(outputFileName);
 				break;
 
 			case 3: 
@@ -515,10 +750,19 @@ void user_menu(league* league, const int session, const vector<game>* games, int
 					cout<<"Error : Teams list is sealed."<<endl;
 				break;
 
-			case 11:		//read game
+			case 11:	//read game
 				readGameAtRound(str,1, true, lastRound, league->getTeams(), league);	//true- write to file
 				break;
+
+			case 12:	//game correction
+				correctGameDate(str, league->getTeams());	
+				break;
+
+			case 13:	//match score correction
+				readGameAtRound(str,1, true, lastRound, league->getTeams(), league);
+				break;
 			}
+
 
 		}else
 			cout<<"Invalid action"<<endl;
@@ -577,11 +821,11 @@ int incrementSession()
 	return session;
 }
 
+int main(int argc , char*argv[]) {
 
 
-int main() {
 	int session = incrementSession();
-	cout<<"\t\t\t-welcome to League tool -"<<endl;
+	cout<<"\t\t\t-Welcome to league tool -"<<endl;
 	
 	int lastRound= 0;
 	vector<team> teams = readTeamsFile();
@@ -589,7 +833,7 @@ int main() {
 	
 	league league(&teams); //construct a league with teams objects. teams dont have games yet.
 	league.init(&allGames);			//? add to every team in the league it's games from vector games?
-	user_menu(&league, session, &allGames,&lastRound);
+	user_menu(&league, session, &allGames,&lastRound,argc,argv);
 
 	system("pause");
 	return 0;
