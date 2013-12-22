@@ -1,119 +1,11 @@
 Team                Games     Points    Total     Score     
 ------------------------------------------------------------
-TeamB               1         2         501       500       
-TeamD               1         2         55        10        
-TeamE               0         0         0         0         
-TeamA               1         0         500       501       
-Team fuck you       0         0         0         0         
-TeamC               1         0         10        55        
-
-Teams
--------
-1. Team fuck you
-2. TeamA
-3. TeamB
-4. TeamC
-5. TeamD
-6. TeamE
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-TeamB               1         2         501       500       
-TeamD               1         2         55        10        
-TeamE               0         0         0         0         
-TeamA               1         0         500       501       
-Team fuck you       0         0         0         0         
-TeamC               1         0         10        55        
-
-Teams
--------
-1. Team fuck you
-2. TeamA
-3. TeamB
-4. TeamC
-5. TeamD
-6. TeamE
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-TeamB               1         2         501       500       
-TeamD               1         2         55        10        
-TeamE               0         0         0         0         
-TeamA               1         0         500       501       
-Team fuck you       0         0         0         0         
-TeamC               1         0         10        55        
-
-Teams
--------
-1. Team fuck you
-2. TeamA
-3. TeamB
-4. TeamC
-5. TeamD
-6. TeamE
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-TeamE               0         0         0         0         
-TeamA               0         0         0         0         
-TeamB               0         0         0         0         
-TeamD               0         0         0         0         
-Team fuck you       0         0         0         0         
-TeamC               0         0         0         0         
-
-Teams
--------
-1. Team fuck you
-2. TeamA
-3. TeamB
-4. TeamC
-5. TeamD
-6. TeamE
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-TeamE               0         0         0         0         
-TeamA               0         0         0         0         
-TeamB               0         0         0         0         
-TeamD               0         0         0         0         
-Team fuck you       0         0         0         0         
-TeamC               0         0         0         0         
-
-Teams
--------
-1. Team fuck you
-2. TeamA
-3. TeamB
-4. TeamC
-5. TeamD
-6. TeamE
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
+TeamD               3         4         302       301       
 TeamB               1         2         101       100       
-TeamD               1         2         101       100       
-TeamE               0         0         0         0         
+TeamE               1         2         101       100       
 TeamA               1         0         100       101       
 Team fuck you       0         0         0         0         
-TeamC               1         0         100       101       
-
-Teams
--------
-1. Team fuck you
-2. TeamA
-3. TeamB
-4. TeamC
-5. TeamD
-6. TeamE
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-TeamB               1         2         101       100       
-TeamD               1         2         101       100       
-TeamE               0         0         0         0         
-TeamA               1         0         100       101       
-Team fuck you       0         0         0         0         
-TeamC               1         0         100       101       
+TeamC               2         0         200       202       
 
 Teams
 -------
@@ -141,4 +33,30 @@ Teams
 4. TeamC
 5. TeamD
 6. TeamE
+
+Team                Games     Points    Total     Score     
+------------------------------------------------------------
+TeamC               2         4         212       210       
+TeamB               1         2         102       101       
+TeamE               1         2         106       105       
+TeamD               3         0         315       318       
+Team fuck you       0         0         0         0         
+TeamA               1         0         101       102       
+
+Teams
+-------
+1. Team fuck you
+2. TeamA
+3. TeamB
+4. TeamC
+5. TeamD
+6. TeamE
+
+show TeamD - TeamE
+TeamD - TeamE  105:106 33:33
+
+show TeamC - TeamD
+TeamC - TeamD  104:103 33:33
+
+TeamC - TeamD  108:107 33:33
 

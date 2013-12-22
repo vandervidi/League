@@ -164,10 +164,10 @@ void updateGamesDatabase(int roundNumber , string day, string month, string year
 }
 
 
-//------------------------------------------------//
+//------------------------------------------------ //
 //Thie method corrects a wrong date in a league	  //
 //game.											  //
-//------------------------------------------------//
+//------------------------------------------------ //
 void correctGameDate(string str, vector<team>* teams){
 	//Remove all kind of special signs from the date.
 	str= delimetersRemover(str, ",.\0", ' ' );
@@ -290,7 +290,19 @@ int check_input(string str)
 	else if (tokenized[0]=="show" && tokenized[1]=="league") {
 		return 2;
 	}
-
+	// In terminal - 'show teamA - teamB'
+        else if (tokenized[0]=="show" && tokenized[1]!="teams" && tokenized[1]!="league") {
+                bool ifHaveMinus= false;
+                for each (string s in tokenized) {
+            if (s== "-"){
+                                ifHaveMinus = true;
+                                break;
+                        }
+        }
+                if (ifHaveMinus == true)
+                        return 3;
+                else return -1;
+        }
 	//In terminal - 'help'
 	else if (tokenized[0]=="help") {
 		return 5;
@@ -371,6 +383,142 @@ void showTeams(string outputFileName){
 		sort(tmp);
 		sortToFile(tmp, outputFileName);
 	}
+}
+
+void showGame_Between_Two_Teams(string str, league* league, string outputFileName){
+        str = delimetersRemover(str, (".,()\0"), ' ' );                        //change from "." and "," to=> ' ' (space)
+        vector<string> lineVector = splitStr(str);                                //make vector from string
+
+        // remove from vector teamA name and "-"
+        lineVector.erase( lineVector.begin() );
+        //save Game temp details
+        //game newGame = game();
+        int index=-1;
+        string teamHome_name="";
+        string teamAway_name="";
+
+        //----(
+        // Find and create teamA name
+        for each (string s in lineVector) {
+                if (s== "-"){
+                        break;
+                }else{
+                        index++;
+                }
+        }
+        if (index>-1){        //check for valid input
+                //vector <string> teamA;
+                                
+                for (int i=0; i<=index; i++){
+                        if (teamHome_name.size()==0)
+                                teamHome_name =lineVector[i];                                        
+                        else teamHome_name +=" "+lineVector[i];
+                }
+                delimetersRemover(teamHome_name, "-\0", ' ');
+                //newGame.setHomeGroup(teamA_name);
+
+                //check teamHome_name AAAAAAAAAAAAAAAAA
+                bool b= false;
+                for each (team t in *league->getTeams() ){
+                        if (teamHome_name.compare(t.getName() )==0){
+                                b=true;
+                                break;
+                        }
+                }
+                if (b==false){
+                        cout<<"error: "<<teamHome_name+ " is not vaild (change in the code for dont push this game to vector at the end)"<<endl;
+                        //return game();
+                }
+        }
+        //----)
+
+        //----( Way-2
+        // Find and create teamB name
+        //index+=2;        
+        
+        // remove from vector teamA name and "-"
+        lineVector.erase( lineVector.begin(),lineVector.begin()+index+2 );
+
+        //romeve all "-" from the string and create new string from that and split that to vector with splitStr()
+        string s="";
+        for (index=0; index< lineVector.size(); index++){
+                lineVector.at(index) = delimetersRemover(lineVector.at(index), ("-\0"), ' ' );                        //change from "." and "," to=> ' ' (space)        
+                if (s.size()==0)
+                                s =lineVector.at(index);                                        
+                        else s +=" "+lineVector.at(index);
+        }
+        lineVector = splitStr(s);
+
+        //identify the nameB
+        for (index=0; index<lineVector.size(); index++) {
+                if ( atoi(lineVector[index].c_str()) ==0 ) {
+                        if (teamAway_name.size()==0)
+                                teamAway_name =lineVector[index];                                        
+                        else teamAway_name +=" "+lineVector[index];
+                }
+                else{
+                        break;
+                }
+        }
+        //newGame.setAwayGroup(teamB_name);
+
+        //check groupB-name
+        bool b= false;
+        for each (team t in *league->getTeams()){
+                if (teamAway_name.compare(t.getName() )==0){
+                        b=true;
+                        break;
+                }
+        }
+        if (b==false){
+                cout<<"error: "<<teamAway_name+ " does not vaild (change in the code for dont push this game to vector at the end)"<<endl;
+                //return game();
+        }
+        //----)
+
+        // check if 2 groups names are the same
+        if (teamHome_name.compare( teamAway_name )==0) {
+                cout<<"error: "<<teamAway_name+ " does not vaild (change in the code for dont push this game to vector at the end)"<<endl;
+                //return game();
+        }
+
+        vector<Date> dateSeen;
+        bool seen = false;
+        //check for games between those fucking teams:
+        for each (team t in *league->getTeams()){
+                for each(game* g in *t.getGames()){
+                        if (g->getHomeGroup().compare( teamHome_name )==0 && g->getAwayGroup().compare( teamAway_name )==0){
+                                // save all date in vector - for dont print out the game twice
+                                for each (Date d in dateSeen){
+                                        if (g->getDate().operator==(d))
+                                                seen = true;
+                                }
+                                if (seen == false){
+                                        cout << g->getHomeGroup()<<" - "<<g->getAwayGroup()<<"  "<<g->getHomeFinalScore()<<":"<<g->getAwayFinalScore()<<" "<<g->getHomeMidScore()<<":"<<g->getAwayMidScore()<<endl;
+
+                                        dateSeen.push_back( g->getDate() );
+
+                                        //write to output file
+                                        if (outputFileName.compare("@")!=0 ) {
+                                                if (dateSeen.size()==1){
+                                                        //first time output - so print also the user command
+                                                        ofstream fileWriter;
+                                                        fileWriter.open(outputFileName, ios_base::app);
+                                                        fileWriter <<str<<endl;
+                                                        fileWriter << g->getHomeGroup()<<" - "<<g->getAwayGroup()<<"  "<<g->getHomeFinalScore()<<":"<<g->getAwayFinalScore()<<" "<<g->getHomeMidScore()<<":"<<g->getAwayMidScore()<<endl<<endl;
+                                                }
+                                                else{
+                                                        ofstream fileWriter;
+                                                        fileWriter.open(outputFileName, ios_base::app);
+                                                        fileWriter<< g->getHomeGroup()<<" - "<<g->getAwayGroup()<<"  "<<g->getHomeFinalScore()<<":"<<g->getAwayFinalScore()<<" "<<g->getHomeMidScore()<<":"<<g->getAwayMidScore()<<endl<<endl;
+                                                }
+                                        }
+
+
+                                }
+                        }
+                }
+        }
 }
 
 void help(){
@@ -702,6 +850,7 @@ void user_menu(league* league, const int session, const vector<game>* games, int
 	string outputFileName =	analyzeOutputFromArgv(argc,argv);
 	string inputFileName =	analyzeInputFromArgv(argc,argv);
 	ifstream fileReader;
+	bool wasInputFile = false;
 	
 	fileReader.open(inputFileName);
 	if (fileReader.fail())
@@ -714,11 +863,17 @@ void user_menu(league* league, const int session, const vector<game>* games, int
 	//and read & xecute lines from it. otherwise, get input from keyboard.
 	if (inputFileName.compare("@")!=0 && fileReader.good())
 	{
+		wasInputFile = true;
 		getline(fileReader,str);
 	}	
 	else
 	{
-		fileReader.close();  //closing stream to input file because it reached EOF
+		if (wasInputFile==true) {
+			fileReader.close();
+					//4924/4974
+			break;
+		}
+		  //closing stream to input file because it reached EOF
 		cout<<"type command or type 'help' for list of valid commands."<<endl;
 		getline(cin,str);
 	}
@@ -736,7 +891,7 @@ void user_menu(league* league, const int session, const vector<game>* games, int
 				break;
 
 			case 3: 
-				cout<<"case 3";
+				showGame_Between_Two_Teams(str, league, outputFileName);
 				break;
 
 			case 5:		// help command - shows content of help file
@@ -832,7 +987,7 @@ int main(int argc , char*argv[]) {
 	vector<game> allGames= readGameAtRound("dont need to send here string because send 2 as parameter",2, false, &lastRound, &teams, NULL);	//check the team.name from teamsVector source that created.
 	
 	league league(&teams); //construct a league with teams objects. teams dont have games yet.
-	league.init(&allGames);			//? add to every team in the league it's games from vector games?
+	league.init(&allGames);		//? add to every team in the league it's games from vector games?
 	user_menu(&league, session, &allGames,&lastRound,argc,argv);
 
 	system("pause");
