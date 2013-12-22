@@ -22,7 +22,7 @@ class league {
 
 		void init(vector<game>* allGames);
 		void createLeagueTable(string inputFileName);
-		//void setTeams(vector<team> teamsToSet);
+		void setTeams(vector<team>* teamsToSet);
 };
 
 

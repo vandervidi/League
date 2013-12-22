@@ -15,3 +15,4 @@ game 2 dec 17 3000
 teamD - teamE 105-106 33-33
 teamC - teamE 108-107 33-33
 ;
+show league

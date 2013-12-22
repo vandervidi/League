@@ -2,6 +2,7 @@
 
 using namespace std;
 //ctor
+
 league::league(vector<team>* teamsToRegister)
 {
 	teams=teamsToRegister;
@@ -10,6 +11,10 @@ league::league(vector<team>* teamsToRegister)
 //dtor
 league::~league(){}
 
+void league::setTeams(vector<team>* teamsToSet)
+{
+	this->teams=teamsToSet;
+}
 
 void league::init(vector<game>* allGames)
 {

@@ -357,13 +357,14 @@ int check_input(string str)
 	return -1;
 }
 
-void addTeam(string database, ifstream fileReader) {
+void addTeam(string database,ifstream* fileReader) {
 	//Adds a team. Two things happen next.
 	//(-) The team name is appended to the file teams.db.
 	//(-) The team is appended to the league.db file and all its league
 	//	   parameters are reset to zero.(Points, number of games ..)
 	cout<<"Enter team name:"<<endl;
 	ofstream outputToTeamsDb;
+	//ifstream fileReader;
 	string tmp;
 	if(database.empty())
 	{
@@ -378,14 +379,31 @@ void addTeam(string database, ifstream fileReader) {
 		string tmp=".\\"+database+"\\teams.db";
 		outputToTeamsDb.open(tmp, ios_base::app);
 	}
-	if (fileReader!=NULL)
-		getline(fileReader,tmp);
+	//get a team name from input file if exist. otherwise read inpu from keyboard
+	
+	if (fileReader->good())
+	{
+		getline(*fileReader,tmp);
+	}
+	else
+	{
+		getline(cin,tmp);
+	}
+	//write the team name into teams database file
 	while(tmp.compare(";")!=0){
 		outputToTeamsDb<<tmp<<endl;
-		getline(cin,tmp);
+		if (fileReader->good())
+		{
+			getline(*fileReader,tmp);
+		}
+		else
+		{
+			getline(cin,tmp);
+		}
 	}	
 
 	outputToTeamsDb.close();
+	
 }
 //-----------------------------------------------//
 //A method that writes a string to games.db file //
@@ -407,6 +425,32 @@ void writeToGamesDB(string str,string database)
 	of<<str<<endl;
 	of.close();
 }
+
+vector<team> readTeamsFile(string database){
+	vector<team> teams;
+	ifstream fileReader;
+	string tmp;
+	team tmpTeam;
+	if(database.empty())
+	{
+	fileReader.open("teams.db");
+	}
+	else
+	{
+		
+		string tmp=".\\"+database+"\\teams.db";
+		fileReader.open(tmp);
+	}
+	while(getline(fileReader,tmp)) {
+			tmpTeam=team(tmp);
+		if ( tmpTeam.getName()!="\n" && tmpTeam.getName() !="" && tmpTeam.getName() !=" ")
+			teams.push_back(tmpTeam);
+	}
+	fileReader.close();
+
+	return teams;
+}
+
 
 //-----------------------------------------------//
 //This method reads to teams.db file and outputs //
@@ -748,7 +792,7 @@ return game();
 // typeInput=1  for input from keyboard			//
 // typeInput=2  for read from db				//
 //----------------------------------------------//
-vector<game> readGameAtRound(string line, int typeInput, bool writeToFile, int* lastRound, vector<team>* teamsPtr, league* leaguePtr,string database) {	
+vector<game> readGameAtRound(string line, int typeInput, bool writeToFile, int* lastRound, vector<team>* teamsPtr, league* leaguePtr,string database,ifstream* fileReader) {	
 	vector<game> v;
 	// type 1 from menu
 	if (typeInput==1){
@@ -813,7 +857,15 @@ vector<game> readGameAtRound(string line, int typeInput, bool writeToFile, int* 
 				string str;
 				while(str!= ";"){
 					str.clear();
-					getline(cin,str);
+					if (fileReader->good())
+					{
+						getline(*fileReader,str);
+					}
+					else
+					{
+						getline(cin,str);
+					}
+					
 					if (str!= ";"){
 						game newGame = functionToCreateNewGameObject(str, gameTempDetails, writeToFile, *teamsPtr, leaguePtr,database);
 						// IF team names are valid, push the game to league ->each team -> game vector;
@@ -905,7 +957,7 @@ vector<game> readGameAtRound(string line, int typeInput, bool writeToFile, int* 
 	return v;
 }
 
-void user_menu(league* league, const int session, const vector<game>* games, int* lastRound, int argc, char** argv)
+void user_menu(league* league, const int session, const vector<game>* games, int* lastRound, int argc, char** argv,vector<team>* teams, vector<game>* allGames)
 {
 	string str;
 	int caseNum;
@@ -963,14 +1015,19 @@ void user_menu(league* league, const int session, const vector<game>* games, int
 				break;
 
 			case 10:
-				if (session == 1 && games->size()==0)
-					addTeam(database, fileReader);
+				if (session == 1 && games->size()==0){
+					addTeam(database,&fileReader);
+				*teams = readTeamsFile(database);
+				vector<game> allGames= readGameAtRound("dont need to send here string because send 2 as parameter",2, false, lastRound, teams, NULL,database,&fileReader);	//check the team.name from teamsVector source that created.
+				league->setTeams(teams); //construct a league with teams objects. teams dont have games yet.
+				league->init(&allGames);		//? add to every team in the league it's games from vector games?
+				}
 				else
 					cout<<"Error : Teams list is sealed."<<endl;
 				break;
 
 			case 11:	//read game
-				readGameAtRound(str,1, true, lastRound, league->getTeams(), league,database);	//true- write to file
+				readGameAtRound(str,1, true, lastRound, league->getTeams(), league,database,&fileReader);	//true- write to file
 				break;
 
 			case 12:	//game correction
@@ -978,7 +1035,7 @@ void user_menu(league* league, const int session, const vector<game>* games, int
 				break;
 
 			case 13:	//match score correction
-				readGameAtRound(str,1, true, lastRound, league->getTeams(), league,database);
+				readGameAtRound(str,1, true, lastRound, league->getTeams(), league,database,&fileReader);
 				break;
 			}
 
@@ -989,30 +1046,6 @@ void user_menu(league* league, const int session, const vector<game>* games, int
 }
 
 
-vector<team> readTeamsFile(string database){
-	vector<team> teams;
-	ifstream fileReader;
-	string tmp;
-	team tmpTeam;
-	if(database.empty())
-	{
-	fileReader.open("teams.db");
-	}
-	else
-	{
-		
-		string tmp=".\\"+database+"\\teams.db";
-		fileReader.open(tmp);
-	}
-	while(getline(fileReader,tmp)) {
-			tmpTeam=team(tmp);
-		if ( tmpTeam.getName()!="\n" && tmpTeam.getName() !="" && tmpTeam.getName() !=" ")
-			teams.push_back(tmpTeam);
-	}
-	fileReader.close();
-
-	return teams;
-}
 
 
 int incrementSession()
@@ -1050,17 +1083,17 @@ int incrementSession()
 
 int main(int argc , char* argv[]) {
 
-
+	ifstream fileReader;
 	int session = incrementSession();
 	cout<<"\t\t\t-Welcome to league tool -"<<endl;
 	string database=analyzeDbFromArgv(argc,argv);
 	int lastRound= 0;
 	vector<team> teams = readTeamsFile(database);
-	vector<game> allGames= readGameAtRound("dont need to send here string because send 2 as parameter",2, false, &lastRound, &teams, NULL,database);	//check the team.name from teamsVector source that created.
+	vector<game> allGames= readGameAtRound("dont need to send here string because send 2 as parameter",2, false, &lastRound, &teams, NULL,database,&fileReader);	//check the team.name from teamsVector source that created.
 	
 	league league(&teams); //construct a league with teams objects. teams dont have games yet.
 	league.init(&allGames);		//? add to every team in the league it's games from vector games?
-	user_menu(&league, session, &allGames,&lastRound,argc,argv);
+	user_menu(&league, session, &allGames,&lastRound,argc,argv,&teams,&allGames);
 
 	system("pause");
 	return 0;
