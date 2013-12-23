@@ -202,3 +202,54 @@ teamE               6         6         639       639
 teamD               6         0         624       630       
 teamA               3         0         303       306       
 
+Team                Games     Points    Total     Score     
+------------------------------------------------------------
+Show                0         0         0         0         
+game                0         0         0         0         
+Game                0         0         0         0         
+teamD               0         0         0         0         
+show                0         0         0         0         
+
+Teams
+-------
+1. Game
+2. Show
+3. game
+4. show
+5. teamD
+
+Team                Games     Points    Total     Score     
+------------------------------------------------------------
+Show                0         0         0         0         
+game                0         0         0         0         
+Game                0         0         0         0         
+teamD               0         0         0         0         
+show                0         0         0         0         
+
+Team                Games     Points    Total     Score     
+------------------------------------------------------------
+teamD               0         0         0         0         
+show                0         0         0         0         
+
+Teams
+-------
+1. show
+2. teamD
+
+Team                Games     Points    Total     Score     
+------------------------------------------------------------
+teamD               0         0         0         0         
+show                0         0         0         0         
+
+Team                Games     Points    Total     Score     
+------------------------------------------------------------
+teamD               0         0         0         0         
+
+Teams
+-------
+1. teamD
+
+Team                Games     Points    Total     Score     
+------------------------------------------------------------
+teamD               0         0         0         0         
+

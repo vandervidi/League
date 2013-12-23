@@ -1,9 +1,9 @@
 register teams
-teamA
-teamB
-teamC
+Show
+game
+Game
 teamD
-teamE
+show
 ;
 show league
 show teams

@@ -383,22 +383,40 @@ void addTeam(string database,ifstream* fileReader) {
 	
 	if (fileReader->good())
 	{
-		getline(*fileReader,tmp);
+		do{
+			getline(*fileReader,tmp);
+		}while(tmp.compare("show")==0 || tmp.compare("Show")==0 || 
+				tmp.compare("date")==0 || tmp.compare("Date")==0 ||
+				tmp.compare("game")==0 || tmp.compare("Game")==0 ||
+				tmp.compare("teams")==0 || tmp.compare("Teams")==0);
 	}
 	else
 	{
-		getline(cin,tmp);
+		do{
+			getline(cin,tmp);
+		}while(tmp.compare("show")==0 || tmp.compare("Show")==0 || 
+				tmp.compare("date")==0 || tmp.compare("Date")==0 ||
+				tmp.compare("game")==0 || tmp.compare("Game")==0 ||
+				tmp.compare("teams")==0 || tmp.compare("Teams")==0);
 	}
 	//write the team name into teams database file
 	while(tmp.compare(";")!=0){
 		outputToTeamsDb<<tmp<<endl;
 		if (fileReader->good())
 		{
-			getline(*fileReader,tmp);
+			do{getline(*fileReader,tmp);
+				}while(tmp.compare("show")==0 || tmp.compare("Show")==0 || 
+				tmp.compare("date")==0 || tmp.compare("Date")==0 ||
+				tmp.compare("game")==0 || tmp.compare("Game")==0 ||
+				tmp.compare("teams")==0 || tmp.compare("Teams")==0);
 		}
 		else
 		{
-			getline(cin,tmp);
+			do{getline(cin,tmp);
+				}while(tmp.compare("show")==0 || tmp.compare("Show")==0 || 
+				tmp.compare("date")==0 || tmp.compare("Date")==0 ||
+				tmp.compare("game")==0 || tmp.compare("Game")==0 ||
+				tmp.compare("teams")==0 || tmp.compare("Teams")==0);
 		}
 	}	
 
@@ -1016,7 +1034,7 @@ void user_menu(league* league, const int session, const vector<game>* games, int
 
 			case 10:
 				if (session == 1 && games->size()==0){
-					addTeam(database,&fileReader);
+				addTeam(database,&fileReader);
 				*teams = readTeamsFile(database);
 				vector<game> allGames= readGameAtRound("dont need to send here string because send 2 as parameter",2, false, lastRound, teams, NULL,database,&fileReader);	//check the team.name from teamsVector source that created.
 				league->setTeams(teams); //construct a league with teams objects. teams dont have games yet.
