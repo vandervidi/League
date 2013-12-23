@@ -298,8 +298,10 @@ return "@";
 //---------------------------------------------- //
 int check_input(string str)
 {
+	//lower every char in str
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 	// check empty string
-	if (str == "" || str == "\n") 
+	if (str == "" || str == "\n"|| str=="show" || str=="game" || str=="date" || str=="team") 
 		return -1;
 
 	vector<string> tokenized = splitStr(str);
