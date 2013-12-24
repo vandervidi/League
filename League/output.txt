@@ -253,87 +253,86 @@ Team                Games     Points    Total     Score
 ------------------------------------------------------------
 teamD               0         0         0         0         
 
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-teamD               0         0         0         0         
+Teams
+-------
+
+Teams
+-------
 
 Teams
 -------
 1. teamD
 
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-teamD               0         0         0         0         
+Teams
+-------
 
 Team                Games     Points    Total     Score     
 ------------------------------------------------------------
+teamA               1         2         77        66        
+teamC               1         2         55        44        
+teamB               1         0         66        77        
+teamD               1         0         44        55        
+
+Team                Games     Points    Total     Score     
+------------------------------------------------------------
+teamA               0         0         0         0         
+teamB               0         0         0         0         
+teamC               0         0         0         0         
 teamD               0         0         0         0         
 
 Teams
 -------
-1. teamD
+1. teamA
+2. teamB
+3. teamC
+4. teamD
 
 Team                Games     Points    Total     Score     
 ------------------------------------------------------------
-teamD               0         0         0         0         
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-teamD               0         0         0         0         
-
-Teams
--------
-1. teamD
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-teamD               0         0         0         0         
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
+teamA               0         0         0         0         
+teamB               0         0         0         0         
+teamC               0         0         0         0         
 teamD               0         0         0         0         
 
 Teams
 -------
-1. teamD
+1. teamA
+2. teamB
+3. teamC
+4. teamD
 
 Team                Games     Points    Total     Score     
 ------------------------------------------------------------
-teamD               0         0         0         0         
+teamB               1         2         102       101       
+teamC               1         2         104       103       
+teamA               1         0         101       102       
+teamD               1         0         103       104       
 
 Team                Games     Points    Total     Score     
 ------------------------------------------------------------
-teamD               0         0         0         0         
-
-Teams
--------
-1. teamD
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-teamD               0         0         0         0         
+teamB               1         2         112       111       
+teamC               1         2         104       103       
+teamA               2         0         151       152       
+teamD               2         0         143       144       
 
 Team                Games     Points    Total     Score     
 ------------------------------------------------------------
-teamD               0         0         0         0         
-
-Teams
--------
-1. teamD
-
-Team                Games     Points    Total     Score     
-------------------------------------------------------------
-teamD               0         0         0         0         
+teamA               2         2         612       612       
+teamB               1         2         112       111       
+teamC               1         2         104       103       
+teamD               2         0         603       605       
 
 Team                Games     Points    Total     Score     
 ------------------------------------------------------------
-teamD               0         0         0         0         
-
-Teams
--------
-1. teamD
+teamA               3         4         912       712       
+teamB               1         2         112       111       
+teamC               2         2         204       403       
+teamD               2         0         603       605       
 
 Team                Games     Points    Total     Score     
 ------------------------------------------------------------
-teamD               0         0         0         0         
+teamA               3         4         812       712       
+teamB               1         2         112       111       
+teamC               2         2         204       303       
+teamD               2         0         603       605       
 

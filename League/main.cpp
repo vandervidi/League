@@ -1,3 +1,9 @@
+
+// Team members :
+//
+// Vidran Abdovich - 312064829, 
+// Ofir Aghai - 302941646
+
 #include <vector>
 #include <string>
 #include <sstream>
@@ -9,7 +15,7 @@
 #include "game.h"
 using namespace std;
 
-//Team members : Vidran Abdovich - 312064829, Ofir Aghai -
+
 //----------------------------------------------//
 //The methods 'sort' - sorts lexicoraphically	//
 //a vector of strings using quick sort algorithm//
@@ -680,7 +686,7 @@ game saveGameDetailsTemp(vector<string> lineVector){
 }
 
 game functionToCreateNewGameObject(string str , game& gameTempDetails, bool writeToFile, vector<team> teams, league* leaguePtr,string database){
-	str = delimetersRemover(str, (".,()\0"), ' ' );			//change from "." and "," to=> ' ' (space)
+	str = delimetersRemover(str, (".,():\0"), ' ' );			//change from "." and "," to=> ' ' (space)
 	vector<string> lineVector = splitStr(str);				//make vector from string
 
 	//save Game temp details
@@ -977,6 +983,103 @@ vector<game> readGameAtRound(string line, int typeInput, bool writeToFile, int* 
 	return v;
 }
 
+//------------------------------------------------ //
+//Update the game between teamA - teamB in game.db	//
+//------------------------------------------------ //
+void updateSpecificGame_InDatabase_BetweenTwoTeams(game gameCorrection, string database) {
+	//string teamHome, string teamAway, int homeFinalScore, int awayFinalScore, int homeMidScore, int awayMidScore
+	ofstream fileWriter;
+	ifstream fileReader;
+	if (database.empty())
+	{
+		fileReader.open("games.db");
+	}
+	else
+	{
+		
+		// create file in path
+		string tmp=".\\"+database+"\\games.db";
+		fileReader.open(tmp);
+	}
+	string tmp;
+	string updatedLine;
+	vector<string> lines;
+	//Save every line from games database to a vector
+	while(getline(fileReader, tmp))
+	{
+		lines.push_back(tmp);
+	}
+	fileReader.close();
+	if (database.empty())
+	{
+	fileWriter.open("games.db",ios::out);
+	}
+	else
+	{
+		// create file in path
+		string tmp=".\\"+database+"\\games.db";
+		fileWriter.open(tmp,ios::out);
+	}
+	//make the correction
+	for(int i=0; i<lines.size() ; i++)
+	{
+		if (lines[i].find(gameCorrection.getHomeGroup()+" - "+gameCorrection.getAwayGroup() ) != std::string::npos ){
+			lines[i] = gameCorrection.getHomeGroup()+" - "+gameCorrection.getAwayGroup()+" "+to_string(gameCorrection.getHomeFinalScore())+":"+to_string(gameCorrection.getAwayFinalScore())+" "+to_string(gameCorrection.getHomeMidScore())+":"+to_string(gameCorrection.getAwayMidScore())+"\n";
+		}
+	}
+
+	//overwrite the games database file
+	for(int i=0; i < lines.size(); i++)
+	{
+		fileWriter<<lines[i]<<endl;
+	}
+}
+
+//correct teamA - teamB 99:88 44:33
+void correctMatchScore(string str, league* l, string database){
+	game temp = game();
+
+	//delete 'correction  (space)' until teamA
+	vector<string> v = splitStr(str);
+	v.erase( v.begin() );
+
+	string newStr ="";
+	for each (string s in v){
+		if (newStr.compare("")==0)
+			newStr=s;
+		else newStr+= " "+s;
+	}
+	//delete the space in the end
+	//newStr = newStr.substr(0, newStr.length()-1);
+
+	// create temp game from line
+	game g = functionToCreateNewGameObject(newStr , temp, false, *l->getTeams(), l, database);
+
+	//string teamHome = "";
+	//string teamAway = "";
+	//int	homeFinalScore, awayFinalScore, homeMidScore, awayMidScore;
+	////find this game in league and update it from g
+
+	//// teams iterator
+	//for (int i=0; i<l->getTeams()->size(); i++ ) {
+	//	
+	//	// game iterator
+	//	for (int j=0; j<l->getTeams()->at(i).getGames()->size(); j++){
+	//		
+	//		if ( g.getHomeGroup().compare(  l->getTeams()->at(i).getGames()->at(j)->getHomeGroup() )==0 ) {
+	//			if ( g.getAwayGroup().compare( l->getTeams()->at(i).getGames()->at(j)->getAwayGroup() )==0 ) {
+	//				// find teamA - teamB game
+	//				// set the new values
+	//				
+	//			}
+	//		}
+	//	}
+	//}
+
+	//now update the game in games.db file
+	updateSpecificGame_InDatabase_BetweenTwoTeams(g, database);
+}
+
 void user_menu(league* league, const int session, const vector<game>* games, int* lastRound, int argc, char** argv,vector<team>* teams, vector<game>* allGames)
 {
 	string str;
@@ -1055,7 +1158,11 @@ void user_menu(league* league, const int session, const vector<game>* games, int
 				break;
 
 			case 13:	//match score correction
-				readGameAtRound(str,1, true, lastRound, league->getTeams(), league,database,&fileReader);
+				correctMatchScore(str, league, database);
+				*teams = readTeamsFile(database);
+				vector<game> allGames= readGameAtRound("dont need to send here string because send 2 as parameter",2, false, lastRound, teams, NULL,database,&fileReader);	//check the team.name from teamsVector source that created.
+				league->setTeams(teams); //construct a league with teams objects. teams dont have games yet.
+				league->init(&allGames);		//? add to every team in the league it's games from vector games?
 				break;
 			}
 
