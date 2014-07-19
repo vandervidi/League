@@ -1,2 +1,3 @@
-League - A basketball league management made in C++.
+League 
 ======
+A basketball league management made in C++.
